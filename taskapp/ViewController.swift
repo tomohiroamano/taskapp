@@ -17,7 +17,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     let realm = try! Realm()  // ←追加
     
     // DB内のタスクが格納されるリスト。objects(_:)メソッドでデータの一覧を取得
-    // 日付近い順\順でソート：降順
+    // 日付近い順\順でソート：降順　ascending:false
     // 以降内容をアップデートするとリスト内は自動的に更新される。
     var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: false)  // ←追加
     
@@ -42,14 +42,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         
         // Cellに値を設定する.  --- ここから ---
+        //indexPath.rowの位置のtaskArrayの中身（tableViewの行の位置のデータ）を取得
         let task = taskArray[indexPath.row]
+        //?はオプショナルチェイニング、オプショナル型変数に続けてプロパティ取得、メソッドを呼び出し時に使用
         cell.textLabel?.text = task.title
         
+        //DateFormatter()インスタンスを取得、日付のフォーマットを変えたりするのに使うClass
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         
+        //日付はDate型であるため、cell.detailTextLabel?.textに代入するためにString型に変換
         let dateString:String = formatter.string(from: task.date)
-        cell.detailTextLabel?.text = dateString
+        cell.detailTextLabel?.text = dateString //変更したものをセット
         // --- ここまで追加 ---
         
         return cell
@@ -68,9 +72,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     // Delete ボタンが押された時に呼ばれるメソッド
+    //tableView(_:commit:forRowAt)メソッドはセルの削除を行う時に呼び出される
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
-        // --- ここから ---
+        // --- ここから --- tableViewの編集モードが.deleteの時
         if editingStyle == .delete {
             // 削除するタスクを取得する
             let task = self.taskArray[indexPath.row]
@@ -81,7 +86,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             
             // データベースから削除する
             try! realm.write {
+                //Realmクラスのdeleteメソッドに削除したいオブジェクトを与えることで削除
                 self.realm.delete(task)
+                //deleteRows(at:with:)メソッドでセルをアニメーションさせながら削除
                 tableView.deleteRows(at: [indexPath], with: .fade)
             }
             
@@ -99,25 +106,27 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
   
     // segue で画面遷移するに呼ばれる
     override func prepare(for segue: UIStoryboardSegue, sender: Any?){
+        //InputViewControllerクラスのtaskプロパティに値を引き渡す
         let inputViewController:InputViewController = segue.destination as! InputViewController
-        
+        //if(既存セルをタップしたとき)、else(新規にタスクを作成するとき)
         if segue.identifier == "cellSegue" {
             let indexPath = self.tableView.indexPathForSelectedRow
             inputViewController.task = taskArray[indexPath!.row]
         } else {
-            let task = Task()
-            task.date = Date()
+            //初期値として現在時間と、プライマリキーであるIDを設定
+            let task = Task()  //Taskクラスのインスタンス作成
+            task.date = Date() //現在時刻を取得するメソッド
             
             let allTasks = realm.objects(Task.self)
             if allTasks.count != 0 {
-                task.id = allTasks.max(ofProperty: "id")! + 1
+                task.id = allTasks.max(ofProperty: "id")! + 1 //既存のタスクid+1を設定
             }
             
             inputViewController.task = task
         }
     }
     
-    // 入力画面から戻ってきた時に TableView を更新させる
+    // 入力画面から戻ってきた時に TableView を更新させる //Willappearは画面遷移の直前に1回だけ呼ばれる
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()

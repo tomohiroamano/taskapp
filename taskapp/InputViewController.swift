@@ -8,20 +8,21 @@
 
 import UIKit
 import RealmSwift
-import UserNotifications    // 追加
+import UserNotifications    // 追加 ローカル通知
 
 class InputViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentsTextView: UITextView!
     @IBOutlet weak var datePicker: UIDatePicker!
     
-    let realm = try! Realm()
-    var task: Task!
+    let realm = try! Realm() //Realm()インスタンス作成
+    var task: Task! //画面遷移元のViewcontrollerから値を受け取る
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // 背景をタップしたらdismissKeyboardメソッドを呼ぶように設定する
+        //UITextField等をタップするとキーボードが出てくるが、そのままでは引っ込まない
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
         
@@ -30,11 +31,14 @@ class InputViewController: UIViewController {
         datePicker.date = task.date
     }
     
+    //遷移する際に、画面が非表示になるとき呼ばれるメソッド、viewWillDisappear
     override func viewWillDisappear(_ animated: Bool) {
         try! realm.write {
+            //入力欄の中に書いてあるデータをtaskにぶち込む
             self.task.title = self.titleTextField.text!
             self.task.contents = self.contentsTextView.text
             self.task.date = self.datePicker.date
+            //taskオブジェクトを更新する
             self.realm.add(self.task, update: true)
         }
         
@@ -81,9 +85,6 @@ class InputViewController: UIViewController {
             }
         }
     } // --- ここまで追加 ---
-    
-    
-    
     
     
     @objc func dismissKeyboard(){
