@@ -112,7 +112,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="iGC-gz-I25">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" restorationIdentifier="contentsTextView" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="iGC-gz-I25">
                                 <rect key="frame" x="10" y="176" width="355" height="120"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -159,7 +159,7 @@
                         <viewLayoutGuide key="safeArea" id="ShO-Si-o3p"/>
                     </view>
                     <connections>
-                        <outlet property="contentTextView" destination="iGC-gz-I25" id="EK1-f7-X6c"/>
+                        <outlet property="contentsTextView" destination="iGC-gz-I25" id="gpd-uB-Ew6"/>
                         <outlet property="datePicker" destination="hZi-Zq-97t" id="e0v-8Z-3Ys"/>
                         <outlet property="titleTextField" destination="wJC-VX-mFT" id="fpo-7c-b2N"/>
                     </connections>
