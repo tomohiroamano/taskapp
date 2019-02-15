@@ -10,8 +10,10 @@ import UIKit
 import RealmSwift   // ←追加
 import UserNotifications    // 追加
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+//課題：UISearchBarDelegateを追加
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchbar: UISearchBar! //課題：UISearchBarを追加
     
     // Realmインスタンスを取得する
     let realm = try! Realm()  // ←追加
@@ -21,13 +23,50 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // 以降内容をアップデートするとリスト内は自動的に更新される。
     var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: false)  // ←追加
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
         tableView.delegate = self
         tableView.dataSource = self
+        searchbar.delegate = self //課題：デリゲート先を自分に設定
+        searchbar.showsCancelButton = true //課題：キャンセルボタンを表示
+        
+        //課題：プレースホルダの指定
+        searchbar.placeholder = "カテゴリ検索の文字列を入力"
+        
+        //課題：何も入力されていなくてもReturnキーを押せるようにする。
+        searchbar.enablesReturnKeyAutomatically = false
+        
+    }
+    
+    //課題：検索ボタン押下時の呼び出しメソッド
+    func searchBarSearchButtonClicked(_ searchbar: UISearchBar) {
+        //キーボード以外をタッチするとキーボードが下がる
+        searchbar.endEditing(true)
+
+    //課題：サーチボックスに何か入力されている時
+    if self.searchbar.text != "" {
+    //入力欄に入れた文字列を定数に格納
+    let categoryinput:String! = self.searchbar.text
+    //フィルター検索実施でtaskArrayを更新
+        taskArray = try! Realm().objects(Task.self).filter("category  == %@", categoryinput).sorted(byKeyPath: "date", ascending: false) // ←追加
+        }
+        //検索結果でTableViewを更新
+        tableView.reloadData()
+        
+    }
+    
+    //課題：サーチボックのキャンセルボタンがタップされた時の動作を記述
+    func searchBarCancelButtonClicked(_ searchbar: UISearchBar) {
+        //キーボード以外をタッチするとキーボードが下がる
+        searchbar.endEditing(true)
+        //サーチボックスを空にする
+        searchbar.text = ""
+        //taskArrayのフィルタリングを外す（元に戻す）
+        taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: false)
+        //TableViewを更新
+        tableView.reloadData()
     }
     
     // MARK: UITableViewDataSourceプロトコルのメソッド

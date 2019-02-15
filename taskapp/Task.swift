@@ -15,6 +15,9 @@ class Task: Object {
     // タイトル
     @objc dynamic var title = ""
     
+    // カテゴリー　※課題として追加
+    @objc dynamic var category = ""
+    
     // 内容
     @objc dynamic var contents = ""
     

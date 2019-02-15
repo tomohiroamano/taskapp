@@ -12,6 +12,7 @@ import UserNotifications    // 追加 ローカル通知
 
 class InputViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
+    @IBOutlet weak var categoryTextField: UITextField! //課題：カテゴリ追加
     @IBOutlet weak var contentsTextView: UITextView!
     @IBOutlet weak var datePicker: UIDatePicker!
     
@@ -27,6 +28,7 @@ class InputViewController: UIViewController {
         self.view.addGestureRecognizer(tapGesture)
         
         titleTextField.text = task.title
+        categoryTextField.text = task.category //課題：カテゴリ追加
         contentsTextView.text = task.contents
         datePicker.date = task.date
     }
@@ -36,6 +38,7 @@ class InputViewController: UIViewController {
         try! realm.write {
             //入力欄の中に書いてあるデータをtaskにぶち込む
             self.task.title = self.titleTextField.text!
+            self.task.category = self.categoryTextField.text! //課題：カテゴリー追加
             self.task.contents = self.contentsTextView.text
             self.task.date = self.datePicker.date
             //taskオブジェクトを更新する
